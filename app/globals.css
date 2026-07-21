@@ -1,0 +1,173 @@
+@import url("https://fonts.googleapis.com/css2?family=Marcellus:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+
+@import "tailwindcss";
+
+@theme {
+  --font-heading: "Marcellus", serif;
+  --font-sans: "IBM Plex Sans", sans-serif;
+
+  /* Light & Modern Color Palette */
+  /* Backgrounds */
+  --color-white: #ffffff;
+  --color-background-soft: #f8f9f7;
+  --color-cream: #fcfcf4;
+
+  /* Sage Greens (Lighter - PRIMARY ACCENT) */
+  --color-sage: #7ba888;
+  --color-sage-light: #a8c9b5;
+  --color-sage-dark: #568673;
+
+  /* Forest (Accents Only) */
+  --color-forest: #182d27;
+  --color-forest-dark: #0f1f1a;
+  --color-forest-soft: #2d3e39;
+
+  /* Text Colors (Dark on Light) */
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #5a5a5a;
+  --color-text-muted: #8a8a8a;
+
+  /* Legacy names for compatibility */
+  --color-teal-dark: #022819;
+  --color-light-sage: #d4e5dc;
+  --color-gray-soft: #7a7a7a;
+  --color-charcoal: #333333;
+}
+
+* {
+  @apply scroll-smooth;
+}
+
+html {
+  @apply scroll-smooth;
+}
+
+@supports (font-variation-settings: normal) {
+  body {
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    @apply !animate-none !transition-none;
+  }
+}
+
+/* Glow and Shadow Effects - Light Theme */
+.glow-sage {
+  box-shadow: 0 0 20px rgba(123, 168, 136, 0.3);
+}
+
+.glow-sage-strong {
+  box-shadow: 0 0 30px rgba(123, 168, 136, 0.5);
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(24, 45, 39, 0.2);
+}
+
+.text-glow-strong {
+  text-shadow: 0 0 30px rgba(24, 45, 39, 0.3);
+}
+
+/* Gradient Border Utility */
+.gradient-border {
+  position: relative;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, rgba(86, 134, 115, 0.3), rgba(86, 134, 115, 0.6), rgba(86, 134, 115, 0.3)) border-box;
+  border: 2px solid transparent;
+}
+
+.gradient-border-hover {
+  position: relative;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, transparent, #568673, transparent) border-box;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.gradient-border-hover:hover {
+  box-shadow: 0 0 20px rgba(86, 134, 115, 0.3);
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 20px rgba(123, 168, 136, 0.3);
+  }
+  50% {
+    opacity: 0.95;
+    box-shadow: 0 0 30px rgba(123, 168, 136, 0.5);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gentle-tilt {
+  0%, 100% {
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+  }
+  25% {
+    transform: perspective(1000px) rotateX(1deg) rotateY(1deg);
+  }
+  75% {
+    transform: perspective(1000px) rotateX(-1deg) rotateY(-1deg);
+  }
+}
+
+/* Animation Utility Classes */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-count-up {
+  animation: count-up 0.6s ease-out forwards;
+}
+
+.animate-gentle-tilt {
+  animation: gentle-tilt 3s ease-in-out infinite;
+}

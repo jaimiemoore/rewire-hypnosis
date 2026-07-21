@@ -1,0 +1,74 @@
+[
+  {
+    "category": "quit-smoking",
+    "name": "Sarah Grondin",
+    "headline": "I\u2019m so Proud that Smoking is Behind Me",
+    "quote": "I never thought I would ever be able to quit. Smoking is a dirty habit and I\u2019m so proud it\u2019s behind me.",
+    "stars": 5,
+    "image": "quit-smoking-sarah-grondin.png"
+  },
+  {
+    "category": "weight-loss",
+    "name": "Melanie Towes",
+    "headline": "Down 20lbs in 4.5 Months",
+    "quote": "I lost 20lbs in 4.5 months.",
+    "stars": 5,
+    "image": "weight-loss-melanie-towes.png"
+  },
+  {
+    "category": "weight-loss",
+    "name": "Darien Martinez Torres",
+    "headline": "In 6 Months I lost 70lbs",
+    "quote": null,
+    "stars": 5,
+    "image": "weight-loss-darien-martinez-torres.png"
+  },
+  {
+    "category": "quit-smoking",
+    "name": "Andrew Hordyk",
+    "headline": "Pack-A-Day Smoker Quits",
+    "quote": "I was coughing every night, snoring heavy & smoking a pack a day. I am now free of the chains.",
+    "stars": 5,
+    "image": "quit-smoking-andrew-hordyk.png"
+  },
+  {
+    "category": "stress-management",
+    "name": "Kirsten Lingard",
+    "headline": "Hypnosis for Stress Management is Unlike Anything I\u2019ve Ever Experienced",
+    "quote": "Hypnosis for stress management is unlike anything I\u2019ve ever experienced. I\u2019ve eliminated irrational fears, built unshakeable self-confidence and improved my work-life balance. I am more productive, more grounded and more myself.",
+    "stars": 5,
+    "image": "stress-management-kirsten-lingard.png"
+  },
+  {
+    "category": "quit-smoking",
+    "name": "James B",
+    "headline": "I No Longer Feel the Guilt & Shame of Smoking & Hiding it",
+    "quote": "Since start hypnosis I find myself not distracted by the need to plan smoke breaks or use them as a reward for tasks completed. My ability to focus has also improved. I no longer feel the guilt and shame of smoking and hiding it. I feel much healthier and have turned to fitness again.",
+    "stars": 5,
+    "image": null
+  },
+  {
+    "category": "quit-smoking",
+    "name": "Derrick Hexamer",
+    "headline": "I Wish I Had Done This Many Years Ago",
+    "quote": "I was a pack-a-day smoker. I tried patches and could never go more than a week smoke-free. With hypnosis I have easily quit smoking in one try. I feel totally in control. I wish I had done this many years ago.",
+    "stars": 5,
+    "image": "quit-smoking-derrick-hexamer.png"
+  },
+  {
+    "category": "quit-smoking",
+    "name": "Brianne Boyce",
+    "headline": "Escaped Smoking Trap & More Relaxed Than Ever",
+    "quote": "I felt trapped by cigarettes. I hated how I felt. I needed a way out, hypnosis has given me that. I feel free again and no longer have cravings. I feel more relaxed than I ever have before. Thank you for helping me get my life back!",
+    "stars": 5,
+    "image": "quit-smoking-brianne-boyce.png"
+  },
+  {
+    "category": "stress-management",
+    "name": "Shirley S",
+    "headline": "My Mind is Now Equipped with the Tools I Need to Naturally Release Stress",
+    "quote": "I always figured I was just an easily stressed type of person. My shoulders would get so tense, even when I'm asleep but since hypnosis something just clicks. If stress starts building up it's like my brain gets a little nudge from somewhere and I actually start to relax. My mind is now equipped with the tools I need to naturally release stress and enjoy my life.",
+    "stars": 5,
+    "image": "stress-management-shirleys.png"
+  }
+]

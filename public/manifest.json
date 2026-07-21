@@ -1,0 +1,45 @@
+{
+  "name": "Rewire Hypnosis - Clinical Hypnosis Services",
+  "short_name": "Rewire Hypnosis",
+  "description": "Evidence-based clinical hypnosis for weight loss, smoking cessation, stress management, and emotional wellness in Cobourg, Ontario",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#568673",
+  "background_color": "#fcfcf4",
+  "icons": [
+    {
+      "src": "/images/logo-navbar.webp",
+      "sizes": "360x144",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logo-navbar.webp",
+      "sizes": "360x144",
+      "type": "image/webp",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/hero-slide-1.webp",
+      "sizes": "1920x1080",
+      "type": "image/webp",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/images/hero-slide-1.webp",
+      "sizes": "540x720",
+      "type": "image/webp",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["health", "wellness"],
+  "screenshots_descriptions": {
+    "weight_loss": "Weight loss hypnosis services",
+    "smoking_cessation": "Smoking cessation through clinical hypnosis",
+    "stress_management": "Stress management and wellness"
+  }
+}
