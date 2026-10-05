@@ -42,6 +42,7 @@ export async function verifyRecaptcha(token: unknown, expectedAction: string) {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body,
       cache: "no-store",
+      signal: AbortSignal.timeout(15000),
     });
 
     if (!response.ok) {
@@ -58,8 +59,8 @@ export async function verifyRecaptcha(token: unknown, expectedAction: string) {
         result.hostname &&
         getAllowedHostnames().has(result.hostname)
     );
-  } catch (error) {
-    console.error("reCAPTCHA verification failed:", error);
+  } catch {
+    console.error("reCAPTCHA verification failed");
     return false;
   }
 }

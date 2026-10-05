@@ -26,11 +26,15 @@ function loadRecaptcha(siteKey: string) {
       if (window.grecaptcha) {
         resolve(window.grecaptcha);
       } else {
+        script.remove();
         reject(new Error("reCAPTCHA failed to initialize"));
       }
     };
 
-    const handleError = () => reject(new Error("reCAPTCHA failed to load"));
+    const handleError = () => {
+      script.remove();
+      reject(new Error("reCAPTCHA failed to load"));
+    };
 
     script.addEventListener("load", handleLoad, { once: true });
     script.addEventListener("error", handleError, { once: true });
@@ -46,9 +50,19 @@ function loadRecaptcha(siteKey: string) {
 }
 
 export async function getRecaptchaToken(action: "contact_submit" | "intake_submit") {
-  const recaptcha = await loadRecaptcha(RECAPTCHA_SITE_KEY);
-
-  await new Promise<void>((resolve) => recaptcha.ready(resolve));
-
-  return recaptcha.execute(RECAPTCHA_SITE_KEY, { action });
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      (async () => {
+        const recaptcha = await loadRecaptcha(RECAPTCHA_SITE_KEY);
+        await new Promise<void>((resolve) => recaptcha.ready(resolve));
+        return recaptcha.execute(RECAPTCHA_SITE_KEY, { action });
+      })(),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("Spam verification could not load. Please try again or contact Rachel.")), 15000);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
 }
