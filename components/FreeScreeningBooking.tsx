@@ -91,7 +91,7 @@ export default function FreeScreeningBooking() {
       {booking ? <section className="space-y-4 rounded-xl border border-sage/30 bg-cream p-5" aria-labelledby="optional-screening-heading">
         <p role="status" className="font-semibold text-forest">{booking === "confirmed" ? "Your booking is complete." : "Your booking request was received. Please check Cal.com for confirmation."}</p>
         <h4 id="optional-screening-heading" className="text-xl font-semibold text-forest">2. Optional screening questions</h4>
-        <p className="text-text-secondary">Highly recommended so Rachel can prepare for your appointment. You can skip them without affecting your booking.</p>
+        <p className="text-text-secondary">Please complete this short screening so we can better serve you. You can skip it without affecting your booking.</p>
         {!questions && !skipped ? <div className="flex flex-wrap gap-3">
           <button type="button" className="rounded-lg bg-forest px-5 py-3 font-semibold text-white focus-visible:ring-2 focus-visible:ring-sage" onClick={() => setQuestions(true)}>Complete screening questions</button>
           <button type="button" className="rounded-lg border border-forest px-5 py-3 font-semibold text-forest focus-visible:ring-2 focus-visible:ring-sage" onClick={() => setSkipped(true)}>Skip for now</button>
@@ -99,7 +99,7 @@ export default function FreeScreeningBooking() {
         {questions ? <><ScreeningQuestions serviceId={serviceId} /><button type="button" className="font-semibold text-forest underline" onClick={() => { setQuestions(false); setSkipped(true); }}>Skip for now</button></> : null}
         {skipped ? <p role="status" className="text-text-secondary">You skipped the optional questions. Your booking is unaffected.</p> : null}
       </section> : null}
-      <p className="text-sm text-text-secondary">Already booked? <a className="font-semibold text-forest underline" href={`/screening?serviceId=${serviceId}`}>Complete optional screening questions</a> whenever you are ready.</p>
+      <p className="text-sm text-text-secondary">Please complete this short screening so we can better serve you. <a className="font-semibold text-forest underline" href={`/screening?serviceId=${serviceId}`}>Screening link</a></p>
     </div> : null}
   </div>;
 }
