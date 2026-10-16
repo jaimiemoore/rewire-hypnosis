@@ -8,6 +8,7 @@ PR: https://github.com/jaimiemoore/rewire-hypnosis/pull/1
 | Criterion | Result | Evidence |
 | --- | --- | --- |
 | Confirmed booking redirects to matching form for all four focuses | Pass, mocked integration | `node scripts/check-screening.mjs`; all focus destinations asserted; official embed callback shape and listener exercised |
+| Slot selection alone does not redirect | Pass, live browser | Selected October 26 at 5 PM in the embedded calendar; booking details appeared while parent URL remained `/#contact-form`; no booking submitted |
 | Pending, rejected, cancelled, unknown callbacks do not redirect | Pass, automated | Focused checks, including later accepted callback |
 | Calendar failure offers retry/contact | Pass for error UI | `linkFailed` triggers retry UI; retry clears error state; listener cleanup ignores disposed callbacks |
 | No public questionnaire links or directory | Pass | Live booking DOM has only contact email link; generic form route shows guidance; all four saved Cal.com descriptions inspected together without questionnaire URLs |
@@ -23,3 +24,5 @@ PR: https://github.com/jaimiemoore/rewire-hypnosis/pull/1
 The live QA notification and receipt were both sent to Rachel with a clearly labelled QA identity. No real client or appointment data was submitted. A delivered provider event confirms recipient-server acceptance, not that Rachel opened or read the message.
 
 The staged Vercel URL required deployment authentication; public browser checks were performed after promotion on the custom production domain. Existing unrelated source warnings and untracked handoff/screenshots were left unchanged.
+
+Evidence: [live form submission success](redirect-success.png). No application errors were observed during the live flow; the deployment error-log query returned no entries.
