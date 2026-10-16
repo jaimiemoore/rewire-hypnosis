@@ -23,6 +23,7 @@ const intake = load("lib/intake.ts");
 let states = [];
 let cursor = 0;
 const redirects = [];
+let effects = [];
 const bookingModule = load("components/FreeScreeningBooking.tsx", {
   react: {
     useState: (initial) => {
@@ -30,7 +31,9 @@ const bookingModule = load("components/FreeScreeningBooking.tsx", {
       if (!(slot in states)) states[slot] = initial;
       return [states[slot], (value) => { states[slot] = typeof value === "function" ? value(states[slot]) : value; }];
     },
-    useEffect: () => {},
+    useEffect: (callback) => effects.push(callback),
+    useRef: () => ({ current: { replaceChildren() {} } }),
+    useEffectEvent: (callback) => callback,
   },
   "@/lib/intake": intake,
   "next/navigation": { useRouter: () => ({ push: (url) => redirects.push(url) }) },
@@ -85,6 +88,62 @@ for (const status of ["pending", "rejected", "cancelled", undefined]) {
   // A subsequent confirmation can still advance a pending request.
   elements(tree).find((node) => node.type?.name === "BookingCalendar").props.onBooked("ACCEPTED");
   assert.deepEqual(redirects, ["/screening?serviceId=weight-loss"]);
+}
+
+// Exercise the official embed listener, including cleanup and calendar retry.
+const savedWindow = globalThis.window;
+const savedDocument = globalThis.document;
+try {
+  const listeners = new Map();
+  const cal = (command, options) => {
+    if (command === "on") listeners.set(options.action, options.callback);
+    if (command === "off") listeners.delete(options.action);
+  };
+  globalThis.window = { Cal: cal };
+  globalThis.document = {
+    createElement: () => ({ remove() {} }),
+    head: { appendChild: (script) => script.onload() },
+  };
+  states = [];
+  cursor = 0;
+  effects = [];
+  redirects.length = 0;
+  let tree = renderBooking();
+  elements(tree).find((node) => node.type === "input").props.onChange();
+  tree = renderBooking();
+  const calendar = elements(tree).find((node) => node.type?.name === "BookingCalendar");
+  states = [];
+  cursor = 0;
+  effects = [];
+  calendar.type(calendar.props);
+  const cleanup = effects[0]();
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(redirects.length, 0);
+  const booked = listeners.get("bookingSuccessfulV2");
+  assert.equal(typeof booked, "function");
+  booked({ detail: { data: { status: "pending" } } });
+  assert.equal(redirects.length, 0);
+  booked({ detail: { data: { status: "accepted" } } });
+  assert.deepEqual(redirects, ["/screening?serviceId=weight-loss"]);
+  listeners.get("linkFailed")();
+  cursor = 0;
+  const failed = calendar.type(calendar.props);
+  const retry = elements(failed).find((node) => node.type === "button" && textContent(node) === "Retry calendar");
+  assert(retry);
+  retry.props.onClick();
+  cursor = 0;
+  assert(!textContent(calendar.type(calendar.props)).includes("Retry calendar"));
+  cleanup();
+  assert.equal(listeners.size, 0);
+  redirects.length = 0;
+  booked({ detail: { data: { status: "accepted" } } });
+  assert.equal(redirects.length, 0);
+} finally {
+  if (savedWindow === undefined) delete globalThis.window;
+  else globalThis.window = savedWindow;
+  if (savedDocument === undefined) delete globalThis.document;
+  else globalThis.document = savedDocument;
 }
 
 // A missing or invalid focus never presents a public questionnaire directory.
