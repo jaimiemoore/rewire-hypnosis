@@ -188,7 +188,7 @@ export default function ScreeningQuestions({ serviceId }: { serviceId: IntakeSer
   return (
     <form onSubmit={submit} className="space-y-5">
       <h3 className="font-heading text-2xl font-bold text-forest">{intakeServices[serviceId].label} screening questions</h3>
-      <p className="text-text-secondary">Optional, but highly recommended. Answer as many or as few questions as you like. Your name and booking email are needed only to match submitted answers to your appointment.</p>
+      <p className="text-text-secondary">Share what you can about your goals and what brought you here. Only fields marked * are required. Please use the name and email from your booking so Rachel can match your answers to your appointment.</p>
       <p className="text-sm text-text-secondary">Sending this form does not book, cancel or change an appointment. Unsent answers are kept only while this page stays open.</p>
       {getScreeningFields(serviceId).map((field) => (
         <FieldControl key={field.id} field={field} value={responses[field.id] || ""}

@@ -1,5 +1,8 @@
 # Calendar-first free screening booking
 
+> Historical calendar-first implementation. Current screening delivery and form behavior are documented in [Screening redirect after booking](email-follow-up.md); that document supersedes the optional questionnaire and email-delivery guidance below.
+
+
 > **Status:** Proposed for review
 
 ## 1. Executive summary

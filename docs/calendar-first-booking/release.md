@@ -1,5 +1,8 @@
 # Calendar-first booking release
 
+> Historical calendar-first implementation. Current screening delivery and form behavior are documented in [Screening redirect after booking](email-follow-up.md); that document supersedes the optional questionnaire and email-delivery guidance below.
+
+
 Status: live at https://www.rewirehypnosis.ca. Production build and browser verification passed.
 
 The website changes are prepared. Do not deploy them until all four Cal.com events enforce the required booking fields. Removing the existing intake gate before configuring Cal.com would allow bookings without phone details or acceptance of the agreements.

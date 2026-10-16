@@ -68,8 +68,8 @@ export async function POST(request: NextRequest) {
     await sendEmail({
       to: ["rachel@rewirehypnosis.ca"],
       reply_to: values.email,
-      subject: `Optional screening answers: ${service.label} - ${values.name.replace(/[\r\n]/g, " ")}`,
-      html: `<div style="font-family:Arial,sans-serif;line-height:1.6"><h2>Optional screening answers</h2><p>Focus: ${label}</p><table>${rows}</table><p>Match to the Cal.com appointment using the supplied booking email. This submission does not create or verify a booking.</p></div>`,
+      subject: `Screening form completed: ${service.label} - ${values.name.replace(/[\r\n]/g, " ")}`,
+      html: `<div style="font-family:Arial,sans-serif;line-height:1.6"><h2>Screening form completed</h2><p>Focus: ${label}</p><table>${rows}</table><p>Match to the Cal.com appointment using the supplied booking email. This submission does not create or verify a booking.</p></div>`,
     });
   } catch {
     console.error("Screening notification delivery could not be confirmed");
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       to: values.email,
       reply_to: "rachel@rewirehypnosis.ca",
       subject: "Your Rewire Hypnosis screening answers were received",
-      html: `<div style="font-family:Arial,sans-serif;line-height:1.6"><h2>Thank you, ${name}</h2><p>Your optional screening answers for ${label} were received.</p><p>Your appointment is managed separately through Cal.com. This form does not book, cancel or change an appointment.</p><p>You can reply to this email with any questions.</p><p>Rachel<br>Rewire Hypnosis</p></div>`,
+      html: `<div style="font-family:Arial,sans-serif;line-height:1.6"><h2>Thank you, ${name}</h2><p>Your screening answers for ${label} were received.</p><p>Your appointment is managed separately through Cal.com. This form does not book, cancel or change an appointment.</p><p>You can reply to this email with any questions.</p><p>Rachel<br>Rewire Hypnosis</p></div>`,
     });
   } catch {
     // Rachel's notification was already accepted. Do not ask for a duplicate.

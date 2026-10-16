@@ -22,6 +22,7 @@ const intake = load("lib/intake.ts");
 // Exercise the booking state transitions without creating real appointments.
 let states = [];
 let cursor = 0;
+const redirects = [];
 const bookingModule = load("components/FreeScreeningBooking.tsx", {
   react: {
     useState: (initial) => {
@@ -32,7 +33,7 @@ const bookingModule = load("components/FreeScreeningBooking.tsx", {
     useEffect: () => {},
   },
   "@/lib/intake": intake,
-  "@/components/ScreeningQuestions": { default: function ScreeningQuestions() {} },
+  "next/navigation": { useRouter: () => ({ push: (url) => redirects.push(url) }) },
 });
 const renderBooking = () => { cursor = 0; return bookingModule.default(); };
 function elements(node) {
@@ -45,31 +46,61 @@ function textContent(node) {
   if (Array.isArray(node)) return node.map(textContent).join(" ");
   return node?.props ? textContent(node.props.children) : "";
 }
-let tree = renderBooking();
-assert(!elements(tree).some((node) => node.type?.name === "ScreeningQuestions"));
-elements(tree).find((node) => node.type === "input").props.onChange();
-tree = renderBooking();
-assert(textContent(tree).includes("Choose a time and complete your booking"));
-assert(!elements(tree).some((node) => node.type?.name === "ScreeningQuestions"));
-elements(tree).find((node) => node.type?.name === "BookingCalendar").props.onBooked("accepted");
-tree = renderBooking();
-assert(textContent(tree).includes("Your booking is complete."));
-assert(elements(tree).find((node) => node.type === "fieldset").props.disabled);
-elements(tree).find((node) => node.type === "button" && textContent(node) === "Skip for now").props.onClick();
-tree = renderBooking();
-assert(textContent(tree).includes("Your booking is unaffected."));
-assert(!elements(tree).some((node) => node.type?.name === "ScreeningQuestions"));
-states = [];
-tree = renderBooking();
-elements(tree).find((node) => node.type === "input").props.onChange();
-tree = renderBooking();
-elements(tree).find((node) => node.type?.name === "BookingCalendar").props.onBooked("pending");
-tree = renderBooking();
-assert(textContent(tree).includes("Your booking request was received."));
-assert(!textContent(tree).includes("Your booking is complete."));
-elements(tree).find((node) => node.type === "button" && textContent(node) === "Complete screening questions").props.onClick();
-tree = renderBooking();
-assert(elements(tree).some((node) => node.type?.name === "ScreeningQuestions"));
+// Every focus stays calendar-first and exposes no questionnaire link or form.
+for (let index = 0; index < intake.intakeServiceIds.length; index++) {
+  states = [];
+  redirects.length = 0;
+  let tree = renderBooking();
+  elements(tree).filter((node) => node.type === "input")[index].props.onChange();
+  tree = renderBooking();
+  assert(textContent(tree).includes("Choose a time and complete your booking"));
+  const assertNoQuestions = () => {
+    assert(!elements(tree).some((node) => node.type?.name === "ScreeningQuestions"));
+    assert(!elements(tree).some((node) => node.type === "a" && node.props.href?.startsWith("/screening")));
+    assert(!elements(tree).some((node) => node.type === "a" && /cal\.com/.test(node.props.href)));
+    assert(!/optional|skip for now/i.test(textContent(tree)));
+  };
+  assertNoQuestions();
+  assert.equal(redirects.length, 0);
+  elements(tree).find((node) => node.type?.name === "BookingCalendar").props.onBooked("accepted");
+  tree = renderBooking();
+  assert(textContent(tree).includes("Your booking is complete."));
+  assert(textContent(tree).includes("Opening your screening questions"));
+  assert.deepEqual(redirects, [`/screening?serviceId=${intake.intakeServiceIds[index]}`]);
+  assert(elements(tree).find((node) => node.type === "fieldset").props.disabled);
+  assertNoQuestions();
+}
+for (const status of ["pending", "rejected", "cancelled", undefined]) {
+  states = [];
+  redirects.length = 0;
+  let tree = renderBooking();
+  elements(tree).find((node) => node.type === "input").props.onChange();
+  tree = renderBooking();
+  elements(tree).find((node) => node.type?.name === "BookingCalendar").props.onBooked(status);
+  tree = renderBooking();
+  assert(textContent(tree).includes("Your booking request was received."));
+  assert(textContent(tree).includes("Your appointment is not yet confirmed"));
+  assert(!textContent(tree).includes("Your booking is complete."));
+  assert.equal(redirects.length, 0);
+  // A subsequent confirmation can still advance a pending request.
+  elements(tree).find((node) => node.type?.name === "BookingCalendar").props.onBooked("ACCEPTED");
+  assert.deepEqual(redirects, ["/screening?serviceId=weight-loss"]);
+}
+
+// A missing or invalid focus never presents a public questionnaire directory.
+const screeningPage = load("app/screening/page.tsx", {
+  "next/link": { default: "a" },
+  "@/lib/intake": intake,
+  "@/components/ScreeningQuestions": { default: function ScreeningQuestions() {} },
+});
+for (const serviceId of [undefined, "invalid", "__proto__", ...intake.intakeServiceIds]) {
+  const page = await screeningPage.default({ searchParams: Promise.resolve({ serviceId }) });
+  const validFocus = intake.isIntakeServiceId(serviceId);
+  assert.equal(elements(page).some((node) => node.type?.name === "ScreeningQuestions"), validFocus);
+  assert(!elements(page).some((node) => node.type === "a" && node.props.href?.startsWith("/screening")));
+  assert(!/optional|skip for now/i.test(textContent(page)));
+}
+assert.equal(screeningPage.metadata.robots.index, false);
 
 assert.equal(intake.isIntakeServiceId("toString"), false);
 assert.equal(intake.isIntakeServiceId("__proto__"), false);
@@ -80,11 +111,11 @@ for (const serviceId of intake.intakeServiceIds) {
   assert(fields.every((field) => field.type !== "consent" && field.type !== "tel"));
   assert(!intake.intakeServices[serviceId].fields.some((field) => field.label.includes("level of investment")));
   const question = fields.find((field) => !field.required && field.type === "textarea");
-  const responses = { name: "Test Visitor", email: "visitor@example.com", [question.id]: "One optional answer", "which-level-of-investment-feels-realistic": "$5000+" };
+  const responses = { name: "Test Visitor", email: "visitor@example.com", [question.id]: "One screening answer", "which-level-of-investment-feels-realistic": "$5000+" };
   const result = intake.validateScreeningResponses(serviceId, responses);
   assert.equal(result.error, null);
   assert.equal(Object.keys(result.values).length, 3);
-  assert(intake.validateScreeningResponses(serviceId, { name: "Test", email: "visitor@example.com" }).error);
+  assert.equal(intake.validateScreeningResponses(serviceId, { name: "Test", email: "visitor@example.com" }).error, null);
   assert(intake.validateScreeningResponses(serviceId, { ...responses, name: "" }).error);
   assert(intake.validateScreeningResponses(serviceId, { ...responses, email: "invalid" }).error);
   assert(intake.validateScreeningResponses(serviceId, { ...responses, [question.id]: "x".repeat(4001) }).error);
@@ -119,7 +150,21 @@ try {
   assert.equal(emails.length, 2);
   assert.deepEqual(emails[0].to, ["rachel@rewirehypnosis.ca"]);
   assert(!emails[0].html.includes("$5000+"));
-  assert(!emails[1].html.includes("One optional answer"));
+  assert(emails[0].subject.startsWith("Screening form completed:"));
+  assert(emails[0].html.includes("Test Visitor"));
+  assert(emails[0].html.includes("visitor@example.com"));
+  assert(emails[0].html.includes("One screening answer"));
+  assert(emails[0].html.includes(intake.intakeServices[valid.serviceId].label));
+  assert.equal(emails[0].reply_to, "visitor@example.com");
+  assert(!emails[1].html.includes("One screening answer"));
+  assert(!emails.some((email) => /optional/i.test(email.subject + email.html)));
+  for (const serviceId of intake.intakeServiceIds) {
+    emails = [];
+    assert.equal((await run({ ...valid, serviceId, responses: { name: "Test Visitor", email: "visitor@example.com" } })).status, 200);
+    assert.equal(emails.length, 2);
+    assert(emails[0].html.includes(intake.intakeServices[serviceId].label));
+    assert(emails[0].html.includes("visitor@example.com"));
+  }
   assert.equal((await run("{bad json")).status, 400);
   assert.equal((await run({ ...valid, serviceId: "__proto__" })).status, 400);
   assert.equal((await run({ ...valid, responses: [] })).status, 400);

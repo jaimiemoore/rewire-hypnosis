@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
           <h2>Thank you for your interest in Rewire Hypnosis!</h2>
           <p>Hi ${name},</p>
           <p>Thank you for reaching out. I've received your inquiry and will be in touch.</p>
-          <p>This message does not book an appointment. You can book a 60-minute free screening on our website, then optionally complete screening questions.</p>
+          <p>This message does not book an appointment. You can book a 60-minute free screening on our website, and complete your screening questions on the website after your booking is confirmed.</p>
           <p>I look forward to connecting with you soon!</p>
           <p style="margin-top: 30px;">Best regards,<br><strong>Rachel</strong><br>Rewire Hypnosis</p>
         `,

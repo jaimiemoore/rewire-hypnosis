@@ -300,25 +300,25 @@ export const intakeServices: Record<IntakeServiceId, IntakeService> = {
   "weight-loss": {
     id: "weight-loss",
     label: "Weight Loss",
-    description: "Optional screening questions, highly recommended to help Rachel prepare.",
+    description: "Screening questions to help Rachel understand your goals and prepare for your appointment.",
     fields: weightLossFields,
   },
   "stop-smoking": {
     id: "stop-smoking",
     label: "Stop Smoking",
-    description: "Optional screening questions, highly recommended to help Rachel prepare.",
+    description: "Screening questions to help Rachel understand your goals and prepare for your appointment.",
     fields: stopSmokingFields,
   },
   "stress-management": {
     id: "stress-management",
     label: "Stress Management",
-    description: "Optional screening questions, highly recommended to help Rachel prepare.",
+    description: "Screening questions to help Rachel understand your goals and prepare for your appointment.",
     fields: stressFields,
   },
   other: {
     id: "other",
     label: "Other",
-    description: "Optional screening questions, highly recommended to help Rachel prepare.",
+    description: "Screening questions to help Rachel understand your goals and prepare for your appointment.",
     fields: stressFields,
   },
 };
@@ -330,7 +330,7 @@ export function isIntakeServiceId(value: unknown): value is IntakeServiceId {
 }
 
 // Booking-owned fields remain available for agreement text, but are not asked
-// again in the optional questionnaire.
+// again in the screening questionnaire.
 export function getScreeningFields(serviceId: IntakeServiceId): IntakeField[] {
   return intakeServices[serviceId].fields.filter(
     (field) => field.type !== "consent" && field.type !== "tel" &&
@@ -361,9 +361,6 @@ export function validateScreeningResponses(serviceId: IntakeServiceId, responses
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email || "")) {
     return { error: "A valid email address is required", values };
-  }
-  if (!fields.some((field) => !field.required && values[field.id])) {
-    return { error: "Answer at least one optional question, or choose Skip for now", values };
   }
   return { error: null, values };
 }
