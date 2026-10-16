@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,6 +20,7 @@ const contactSchema = z.object({
 type ContactFormData = z.infer<typeof contactSchema>;
 
 export default function ContactForm() {
+  const pathname = usePathname();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [showMessageForm, setShowMessageForm] = useState(false);
@@ -77,8 +79,7 @@ export default function ContactForm() {
           <p className="text-gray-soft text-lg">Book your free, no-obligation screening today.</p>
         </motion.div>
 
-        {/* Primary path: intake-gated free screening booking */}
-        <FreeScreeningBooking />
+        {pathname !== "/screening" && pathname !== "/agreements" ? <FreeScreeningBooking /> : null}
 
         {/* Secondary path: lightweight message form (collapsed by default) */}
         <div className="mt-10 text-center">

@@ -9,7 +9,7 @@ export default function HowItWorksSection() {
       icon: Phone,
       number: "1",
       title: "Free Screening Call",
-      description: "We start with a 30-minute complimentary consultation to understand your goals, discuss your specific challenges, answer any questions, and determine if our approach is right for you.",
+      description: "We start with a 60-minute complimentary consultation to understand your goals, discuss your specific challenges, answer any questions, and determine if our approach is right for you.",
       color: "bg-blue-100 text-blue-600"
     },
     {

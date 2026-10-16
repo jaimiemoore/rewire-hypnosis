@@ -54,7 +54,7 @@ function withIds(specs: FieldSpec[]): IntakeField[] {
       while (used.has(id)) id = `${base}-${n++}`;
     }
     used.add(id);
-    return { required: true, ...spec, id };
+    return { ...spec, id, required: id === "name" || id === "email" };
   });
 }
 
@@ -88,7 +88,6 @@ const READY_TO_INVEST = [
   "Possibly, if it feels aligned",
   "I'm mostly looking for free resources right now",
 ];
-const INVESTMENT = ["Under $1000", "$1000-$3000", "$3000-$5000", "$5000+"];
 
 const sessionPreference = (virtualLabel: string): FieldSpec =>
   R("Do you prefer in person sessions or online?", [
@@ -123,7 +122,6 @@ const closingQuestions: FieldSpec[] = [
     "If we decide that this is a good fit, are you financially and emotionally ready to invest in meaningful support to create lasting change?",
     READY_TO_INVEST
   ),
-  R("Which level of investment feels realistic for you right now?", INVESTMENT),
   T("What made you decide to book this call today?"),
 ];
 
@@ -245,7 +243,6 @@ const stopSmokingFields = withIds([
     "If we decide that this is a good fit, are you financially and emotionally ready to invest in meaningful support to create lasting change?",
     READY_TO_INVEST
   ),
-  R("Which level of investment feels realistic for you right now?", INVESTMENT),
   T("What made you decide to book this call today?"),
   waiverConsent(
     "I hereby understand that the training I am purchasing from Rewire Hypnosis is for self-hypnosis and educational purposes only. It is not therapy, and is not meant as a replacement for any other interventions.\n\nRewire Hypnosis uses light and sound technology to enhance my hypnotic experience. I understand that I can choose not to use light and sound technology at any time for any reason.\n\nI understand that the Rewire Hypnosis facility is under video and audio surveillance for the safety of all parties, and for quality assurance and training purposes.\nI hereby release Rewire Hypnosis and Rachel Moore of any and all liability in this matter."
@@ -303,30 +300,70 @@ export const intakeServices: Record<IntakeServiceId, IntakeService> = {
   "weight-loss": {
     id: "weight-loss",
     label: "Weight Loss",
-    description: "Please complete this confidential intake before choosing a free screening time.",
+    description: "Screening questions to help Rachel understand your goals and prepare for your appointment.",
     fields: weightLossFields,
   },
   "stop-smoking": {
     id: "stop-smoking",
     label: "Stop Smoking",
-    description: "Please complete this confidential intake before booking your free screening.",
+    description: "Screening questions to help Rachel understand your goals and prepare for your appointment.",
     fields: stopSmokingFields,
   },
   "stress-management": {
     id: "stress-management",
     label: "Stress Management",
-    description: "Please complete this confidential intake before booking a free screening.",
+    description: "Screening questions to help Rachel understand your goals and prepare for your appointment.",
     fields: stressFields,
   },
   other: {
     id: "other",
     label: "Other",
-    description: "Please complete this confidential intake before choosing a free screening time.",
+    description: "Screening questions to help Rachel understand your goals and prepare for your appointment.",
     fields: stressFields,
   },
 };
 
 export const intakeServiceIds = Object.keys(intakeServices) as IntakeServiceId[];
+
+export function isIntakeServiceId(value: unknown): value is IntakeServiceId {
+  return typeof value === "string" && intakeServiceIds.includes(value as IntakeServiceId);
+}
+
+// Booking-owned fields remain available for agreement text, but are not asked
+// again in the screening questionnaire.
+export function getScreeningFields(serviceId: IntakeServiceId): IntakeField[] {
+  return intakeServices[serviceId].fields.filter(
+    (field) => field.type !== "consent" && field.type !== "tel" &&
+      field.label !== "Do you prefer in person sessions or online?"
+  );
+}
+
+export function validateScreeningResponses(serviceId: IntakeServiceId, responses: Record<string, unknown>) {
+  const values: Record<string, string> = {};
+  const fields = getScreeningFields(serviceId);
+  for (const field of fields) {
+    const raw = responses[field.id];
+    if (raw !== undefined && typeof raw !== "string") {
+      return { error: `${field.label} must be text`, values };
+    }
+    const value = typeof raw === "string" ? raw.trim() : "";
+    const limit = field.id === "name" ? 200 : field.id === "email" ? 254 : 4000;
+    if (value.length > limit) return { error: `${field.label} is too long`, values };
+    if (field.required && !value) return { error: `${field.label} is required`, values };
+    if (value && field.options && !field.options.includes(value)) {
+      return { error: `Choose a valid answer for ${field.label}`, values };
+    }
+    if (value && field.type === "date" && (!/^\d{4}-\d{2}-\d{2}$/.test(value) ||
+      !Number.isFinite(Date.parse(value)) || new Date(value).toISOString().slice(0, 10) !== value)) {
+      return { error: `${field.label} must be a valid date`, values };
+    }
+    if (value) values[field.id] = value;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email || "")) {
+    return { error: "A valid email address is required", values };
+  }
+  return { error: null, values };
+}
 
 // --- Cal.com booking config -------------------------------------------------
 // These are public booking URLs (not secrets) and rarely change, so the live
@@ -342,12 +379,8 @@ export const calEventSlugs: Record<IntakeServiceId, string> = {
   other: process.env.NEXT_PUBLIC_CAL_EVENT_OTHER || "free-screening-other",
 };
 
-/** Builds the embeddable Cal.com booking URL for a service, or null if unset.
- *  Optionally prefills the booker's name/email from the intake responses. */
-export function getCalUrl(
-  serviceId: IntakeServiceId,
-  prefill?: { name?: string; email?: string }
-): string | null {
+/** Public booking URL. Personal details are collected by Cal.com itself. */
+export function getCalUrl(serviceId: IntakeServiceId): string | null {
   const slug = calEventSlugs[serviceId];
 
   if (!calUsername || !slug) {
@@ -355,11 +388,6 @@ export function getCalUrl(
   }
 
   const params = new URLSearchParams({ embed: "true", theme: "light" });
-
-  const name = prefill?.name?.trim();
-  const email = prefill?.email?.trim();
-  if (name) params.set("name", name);
-  if (email) params.set("email", email);
 
   return `https://cal.com/${calUsername}/${slug}?${params.toString()}`;
 }
